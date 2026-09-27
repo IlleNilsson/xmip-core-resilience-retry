@@ -10,7 +10,7 @@
 
 use std::time::Duration;
 
-use resilience::{Attempt, Decision, Guard, RetryPolicy};
+use resilience::{Attempt, Decision, Guard};
 
 /// The retry guard: attempts up to a limit, a delay between them.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -32,12 +32,6 @@ impl Retry {
             factor: 1,
             cap: None,
         }
-    }
-
-    /// The guard the platform's policy declares.
-    #[must_use]
-    pub const fn from_policy(policy: &RetryPolicy) -> Self {
-        Self::new(policy.max_attempts, policy.delay)
     }
 
     /// Multiply the delay by `factor` after every failed attempt, never past
@@ -78,7 +72,7 @@ impl Guard for Retry {
 
     fn after(&self, attempt: &Attempt) -> Decision {
         match &attempt.failure {
-            Some(failure) if failure.is_retryable() && attempt.number < self.max_attempts => {
+            Some(failure) if failure.retryable && attempt.number < self.max_attempts => {
                 Decision::Wait(self.delay_after(attempt.number))
             }
             _ => Decision::Proceed,
@@ -89,8 +83,9 @@ impl Guard for Retry {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use resilience::{Failure, Guarded, execute};
+    use resilience::{Guarded, execute};
     use std::cell::Cell;
+    use xcore::Failure;
 
     fn failed(number: u32, failure: Failure) -> Attempt {
         Attempt {
@@ -127,10 +122,7 @@ mod tests {
 
     #[test]
     fn a_permanent_failure_is_not_tried_again() {
-        let retry = Retry::from_policy(&RetryPolicy {
-            max_attempts: 5,
-            delay: Duration::ZERO,
-        });
+        let retry = Retry::new(5, Duration::ZERO);
         assert_eq!(retry.max_attempts(), 5);
         assert_eq!(
             retry.after(&failed(1, Failure::permanent("broken"))),
