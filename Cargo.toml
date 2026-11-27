@@ -1,11 +1,11 @@
 [package]
 name = "xmip-core-resilience-retry"
-version = "0.1.0"
-edition = "2024"
-license = "AGPL-3.0-or-later"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
 repository = "https://github.com/IlleNilsson/xmip-core-resilience-retry"
 description = "Retry guard: a retryable failure below the attempt limit is tried again after a delay, flat or backing off. A xmip-core-resilience technology."
-publish = false
+publish.workspace = true
 
 [lib]
 path = "src/lib.rs"
@@ -19,13 +19,5 @@ resilience = { package = "xmip-core-resilience", git = "https://github.com/IlleN
 # The failure a test hands the guard.
 xcore = { package = "xmip-core", git = "https://github.com/IlleNilsson/xmip-core", branch = "main" }
 
-[lints.rust]
-unsafe_code = "forbid"
-
-[lints.clippy]
-too_many_lines = "warn"
-pedantic = { level = "warn", priority = -1 }
-missing_errors_doc = "warn"
-missing_panics_doc = "warn"
-unwrap_used = "warn"
-expect_used = "allow"
+[lints]
+workspace = true
