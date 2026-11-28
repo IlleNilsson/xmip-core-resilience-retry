@@ -13,11 +13,11 @@ path = "src/lib.rs"
 [dependencies]
 # A Technology depends on its parent Capability, never the reverse
 # (repository-model.md).
-resilience = { package = "xmip-core-resilience", git = "https://github.com/IlleNilsson/xmip-core-resilience", branch = "main" }
+resilience = { workspace = true }
 
 [dev-dependencies]
 # The failure a test hands the guard.
-xcore = { package = "xmip-core", git = "https://github.com/IlleNilsson/xmip-core", branch = "main" }
+xcore = { workspace = true }
 
 [lints]
 workspace = true
